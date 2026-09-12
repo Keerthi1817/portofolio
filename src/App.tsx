@@ -16,7 +16,7 @@ const App = () => (
       <PortfolioProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter basename="/portfolio">
+        <BrowserRouter basename="/portofolio">
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/admin" element={<Admin />} />
