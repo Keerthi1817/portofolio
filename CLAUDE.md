@@ -17,9 +17,11 @@ npm test        # vitest run
 Personal portfolio site (Keerthivasan K, AI Engineer), a **static site on GitHub Pages**. There is no backend,
 database or admin panel.
 
-- **Content**: everything is hardcoded in `src/lib/portfolio-data.ts` (`defaultData`). Edit that file to change
-  content. Do not add a database or a remote source for it: a previous version merged a shared online row over
-  the defaults, which made the site show another person's details.
+- **Content**: `src/lib/portfolio-data.ts` (`defaultData`) holds only what components read from data: `hero`, `about.bio`,
+  `skills`, `contact` and `articles`. The Experience, Education, Impact, Achievements, Projects and Resume sections are
+  written directly in their component files. Do not add a database or a remote source for content: a previous version
+  merged a shared online row over the defaults, which made the site show another person's details. Only add
+  information about Keerthivasan K.
 - **Context**: `PortfolioProvider` (`src/hooks/use-portfolio-data.tsx`) just exposes `getDefaultPortfolioData()`;
   sections read it through `usePortfolioData()`. Hero and Contact both read `data.contact`.
 - **Routes** (`src/App.tsx`): `/` (portfolio) and `*` (404), React Router with `basename="/portofolio"`.
