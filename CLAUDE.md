@@ -30,5 +30,9 @@ database or admin panel.
 
 ## Deployment
 
-`.github/workflows/pages.yml` builds with `npm run build` (Vite `base: "/portofolio/"`), copies `index.html` to
-`404.html` for deep links, and deploys to GitHub Pages on push to `main`. No environment variables are used.
+The repo is private, and GitHub Pages only serves public repos on a free plan, so **do not use Pages on this repo**.
+`.github/workflows/publish.yml` builds with `npm run build` (Vite `base: "/portofolio/"`) and pushes only the built
+files into the public repo `Keerthi1817/Keerthi1817.github.io`, folder `portofolio/`, using a deploy key stored in the
+`PAGES_DEPLOY_KEY` secret. The site stays at https://keerthi1817.github.io/portofolio/. Keep `PUBLISH_DIR` in the
+workflow equal to the Vite `base` and the router `basename`. Only the official `actions/*` actions are used. No other
+environment variables or secrets are needed. See README.md for the one-time setup.
