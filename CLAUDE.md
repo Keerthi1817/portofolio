@@ -5,51 +5,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm install            # install dependencies
-npm run dev            # dev server on port 8080
-npm run build          # production build
-npm run build:dev      # development build
-npm run preview        # preview production build (port 3000)
-npm run lint           # ESLint
-npm test               # vitest run
-npm run test:watch     # vitest in watch mode
+npm install     # install dependencies
+npm run dev     # dev server on port 8080 (served under /portofolio/)
+npm run build   # production build into dist/
+npm run lint    # ESLint
+npm test        # vitest run
 ```
-
-Vitest uses jsdom environment with `@testing-library/jest-dom` matchers. Test files match `src/**/*.{test,spec}.{ts,tsx}`. The setup file is `src/test/setup.ts`.
 
 ## Architecture
 
-This is a personal portfolio site (Kunal K — AI Engineer) deployed on Lovable Cloud.
+Personal portfolio site (Keerthivasan K, AI Engineer), a **static site on GitHub Pages**. There is no backend,
+database or admin panel.
 
-**Data flow**: All content lives in a single Supabase row — `portfolio_settings` (id = `'main'`, JSONB `data` column). The frontend reads from and writes to Supabase directly via `@supabase/supabase-js` (anon key). There is no intermediate API server.
+- **Content**: `src/lib/portfolio-data.ts` (`defaultData`) holds only what components read from data: `hero`, `about.bio`,
+  `skills`, `contact` and `articles`. The Experience, Education, Impact, Achievements, Projects and Resume sections are
+  written directly in their component files. Do not add a database or a remote source for content: a previous version
+  merged a shared online row over the defaults, which made the site show another person's details. Only add
+  information about Keerthivasan K.
+- **Context**: `PortfolioProvider` (`src/hooks/use-portfolio-data.tsx`) just exposes `getDefaultPortfolioData()`;
+  sections read it through `usePortfolioData()`. Hero and Contact both read `data.contact`.
+- **Routes** (`src/App.tsx`): `/` (portfolio) and `*` (404), React Router with `basename="/portofolio"`.
+- **UI**: shadcn/ui in `src/components/ui/`, Tailwind CSS, portfolio sections in `src/components/portfolio/`.
+- **Import alias**: `@/` maps to `src/`.
 
-**Context provider**: `PortfolioProvider` (`src/hooks/use-portfolio-data.tsx`) wraps the app. On mount it fetches from Supabase and merges the DB data over hardcoded defaults from `src/lib/portfolio-data.ts`. All portfolio sections consume this context via `usePortfolioData()`.
+## Deployment
 
-**Routes**: Three routes in `src/App.tsx` — `/` (portfolio), `/admin` (editor), `*` (404). React Router v6 with `BrowserRouter`.
-
-**Admin panel** (`src/pages/Admin.tsx`): Tabbed form editor for every portfolio section. Login checks `adminEmail`/`adminPassword` from the DB-stored data, sets a `sessionStorage` flag. Save upserts the row; Reset deletes it (restoring defaults).
-
-**Medium articles**: The `fetch-medium-articles` Edge Function (`supabase/functions/fetch-medium-articles/index.ts`) parses the RSS feed for the configured `mediumUsername`, caches articles into the portfolio_settings JSONB. The frontend reads cached articles and re-invokes the edge function when cache is > 1 hour old.
-
-**UI**: shadcn/ui components in `src/components/ui/`, Tailwind CSS with CSS variables for theming (dark/light via `next-themes`). Portfolio section components live in `src/components/portfolio/`.
-
-**Import alias**: `@/` maps to `src/` (configured in both `vite.config.ts` and `tsconfig.app.json`).
-
-**Supabase types**: Auto-generated in `src/integrations/supabase/types.ts`. The client is in `src/integrations/supabase/client.ts`.
-
-## Docker
-
-```bash
-docker compose up -d    # builds and serves on port 6001 (vite preview on 3000 internally)
-```
-
-Single-stage Dockerfile: `npm install` → `npm run build` → `npm run preview` on port 3000. The host runs nginx as a reverse proxy in front of the container. Build args (`VITE_SUPABASE_*`) are passed from the host `.env` or GitHub Secrets.
-
-## CI/CD (GitHub Actions)
-
-[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) triggers on push/PR merge to `main`, runs on a self-hosted runner (`runs-on: self-hosted`):
-
-1. `git pull origin main` into `/home/ubuntu/all_bots/Kunal-Portfolio`
-2. Writes `.env` from GitHub Secrets if set, otherwise keeps existing `.env`
-3. `docker compose down && docker compose up -d --build`
-4. Health check + image prune
+`.github/workflows/pages.yml` builds with `npm run build` (Vite `base: "/portofolio/"`), copies `index.html` to
+`404.html` for deep links, and deploys to GitHub Pages on push to `main`. No environment variables are used.
