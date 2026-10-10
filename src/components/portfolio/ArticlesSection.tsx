@@ -1,8 +1,6 @@
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { BookOpen, ExternalLink, Rss } from "lucide-react";
+import { BookOpen, ExternalLink } from "lucide-react";
 import { usePortfolioData } from "@/hooks/use-portfolio-data";
-import { supabase } from "@/integrations/supabase/client";
 
 interface Article {
   id: string;
@@ -13,52 +11,11 @@ interface Article {
   source: string;
 }
 
-function formatDate(d: string) {
-  if (!d) return "";
-  const dt = new Date(d);
-  if (isNaN(dt.getTime())) return d;
-  return dt.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
-}
-
-const CACHE_MAX_AGE_MS = 60 * 60 * 1000; // 1 hour
-
 export function ArticlesSection() {
   const { data } = usePortfolioData();
-  const [mediumArticles, setMediumArticles] = useState<Article[]>([]);
-  const [loading, setLoading] = useState(false);
+  const allArticles = data.articles || [];
 
-  useEffect(() => {
-    if (!data.mediumUsername) {
-      setMediumArticles([]);
-      return;
-    }
-
-    const cached = (data.cachedMediumArticles || []) as Article[];
-    if (cached.length > 0) setMediumArticles(cached);
-
-    const cachedAt = data.mediumCachedAt ? new Date(data.mediumCachedAt).getTime() : 0;
-    const isStale = Date.now() - cachedAt > CACHE_MAX_AGE_MS;
-
-    if (isStale) {
-      setLoading(cached.length === 0);
-      supabase.functions
-        .invoke("fetch-medium-articles")
-        .then(({ data: res, error }) => {
-          if (error) throw error;
-          if (res?.articles) setMediumArticles(res.articles as Article[]);
-        })
-        .catch((err) => console.error("Failed to fetch Medium articles:", err))
-        .finally(() => setLoading(false));
-    }
-  }, [data.mediumUsername, data.cachedMediumArticles, data.mediumCachedAt]);
-
-  const manualArticles = data.articles || [];
-  const allArticles = [
-    ...manualArticles,
-    ...mediumArticles.map((a) => ({ ...a, date: formatDate(a.date) })),
-  ];
-
-  if (allArticles.length === 0 && !loading && !data.mediumUsername) return null;
+  if (allArticles.length === 0) return null;
 
   return (
     <section id="articles" className="py-32 px-6 relative z-10 overflow-hidden">
@@ -75,14 +32,7 @@ export function ArticlesSection() {
           </h3>
         </motion.div>
 
-        {loading && (
-          <div className="flex items-center gap-2 text-muted-foreground mb-8">
-            <Rss className="w-4 h-4 animate-pulse" />
-            <span className="text-sm">Fetching articles from Medium...</span>
-          </div>
-        )}
-
-        {allArticles.length === 0 && !loading ? (
+        {allArticles.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}

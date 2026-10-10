@@ -5,12 +5,8 @@ import { usePortfolioData } from "@/hooks/use-portfolio-data";
 export function HeroSection() {
   const { data } = usePortfolioData();
   const { hero } = data;
-  const contact = {
-    email: "keerthivasan1845@gmail.com",
-    github: "https://github.com/Keerthi1817",
-    linkedin: "https://www.linkedin.com/in/keerthivasan1845/",
-  };
-  const displayHero = { ...hero, name: "Keerthivasan K" };
+  const { contact } = data;
+  const displayHero = hero;
   const scrollToContact = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
     document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth", block: "start" });

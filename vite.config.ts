@@ -14,11 +14,6 @@ export default defineConfig(({ mode }) => ({
       overlay: false,
     },
   },
-  preview: {
-    host: "::",
-    port: 3000,
-    allowedHosts: ["kunalx.is-a.dev"],
-  },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
     alias: {

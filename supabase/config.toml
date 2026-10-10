@@ -1,7 +1,0 @@
-project_id = "xihfgapobuwxsntigbjr"
-
-[functions.fetch-medium-articles]
-verify_jwt = false
-
-[functions.admin-portfolio]
-verify_jwt = false

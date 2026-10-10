@@ -84,18 +84,6 @@ export interface PortfolioData {
     stack: string[];
   };
   resumeUrl: string;
-  mediumUsername: string;
-  adminPassword: string;
-  adminEmail: string;
-  cachedMediumArticles?: {
-    id: string;
-    title: string;
-    description: string;
-    url: string;
-    date: string;
-    source: string;
-  }[];
-  mediumCachedAt?: string;
 }
 
 const defaultData: PortfolioData = {
@@ -409,10 +397,7 @@ const defaultData: PortfolioData = {
     ],
     stack: ["Python", "PyTorch", "LangChain", "Azure OpenAI", "Kubernetes", "Neo4j", "FastAPI"],
   },
-  resumeUrl: "https://drive.google.com/file/d/1yMxvIZeexmHkq1knKkHcwE7IOlumqDEZ/view?usp=sharing",
-  mediumUsername: "",
-  adminPassword: "Chinamade@123!",
-  adminEmail: "admin@keerthivasan.com",
+  resumeUrl: "", // add your own resume link here (the previous value pointed to someone else's file)
 };
 
 export function getDefaultPortfolioData(): PortfolioData {
@@ -426,10 +411,10 @@ export function getPortfolioData(): PortfolioData {
   return getDefaultPortfolioData();
 }
 
-export function savePortfolioData(data: PortfolioData) {
-  // No-op: now handled by database
+export function savePortfolioData(_data: PortfolioData) {
+  // No-op: content is hardcoded in this file
 }
 
 export function resetPortfolioData() {
-  // No-op: now handled by database
+  // No-op: content is hardcoded in this file
 }

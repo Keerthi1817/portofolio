@@ -1,59 +1,41 @@
 # Portfolio
 
-Personal portfolio site for Kunal K — an AI Engineer specializing in AI Agents and LLMOps.
+Personal portfolio site for Keerthivasan K, an AI Engineer.
+
+Live site (GitHub Pages): https://keerthi1817.github.io/portofolio/
 
 ## Tech Stack
 
 - Vite + React + TypeScript
 - Tailwind CSS + shadcn/ui
 - Framer Motion
-- Lovable Cloud (Supabase) — database, edge functions
+- Hosted on GitHub Pages (static site, no backend or database)
 
-## Data & Persistence
+## How to change your content
 
-All portfolio content (hero, about, projects, skills, experience, certifications, education, articles, contact, admin credentials, etc.) is stored in the cloud database in the `portfolio_settings` table (single row, `id = 'main'`).
+All content (hero, about, projects, skills, experience, education, certifications, contact details, ...) is
+hardcoded in one file: [`src/lib/portfolio-data.ts`](src/lib/portfolio-data.ts).
 
-- The site loads content from the database on every visit, so all visitors see the same content.
-- Edits made in the Admin panel (`/admin`) are written directly to the database and reflect globally.
-- Clicking **Reset** in the Admin panel deletes the row from the database, restoring the default hardcoded content.
-- Nothing is persisted in `localStorage` — only the admin session flag in `sessionStorage`.
+1. Edit that file (you can use GitHub's web editor: open the file, click the pencil icon).
+2. Commit to `main`. The **Deploy to GitHub Pages** workflow rebuilds and publishes the site in a minute or two.
 
-## Medium Articles
+Your contact details live in the `contact` block of that file (email, GitHub, LinkedIn, Instagram) and are the
+only place they are defined; the hero and the contact section both read from it.
 
-Medium articles are fetched by the `fetch-medium-articles` edge function, which:
-
-1. Reads the configured Medium username from `portfolio_settings`.
-2. Fetches and parses the Medium RSS feed.
-3. Caches the parsed articles back into `portfolio_settings` (`cachedMediumArticles`, `mediumCachedAt`).
-
-The frontend reads the cached articles immediately and only re-invokes the edge function when the cache is older than 1 hour.
-
-## Admin Panel
-
-- Route: `/admin`
-- Login uses the `adminEmail` / `adminPassword` values stored in the database.
-- All Save / Reset actions hit the cloud database directly.
+There is no admin page and no database. (Earlier versions loaded content from a shared online database, which is
+why someone else's details could appear on this site. That has been removed.)
 
 ## Development
 
 ```sh
 npm install
-npm run dev
+npm run dev      # http://localhost:8080/portofolio/
+npm run build    # production build into dist/
+npm test
 ```
 
-## Docker
+## Deployment
 
-```sh
-docker compose up -d    # build and serve on port 6001
-```
-
-The Dockerfile builds the Vite app and serves it with `vite preview` on port 3000. The host nginx reverse-proxies port 6001 to the container.
-
-## CI/CD
-
-Push or PR merge to `main` triggers a GitHub Actions workflow ([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)) that runs on a self-hosted runner on an Oracle cloud server:
-
-1. `git pull` latest main
-2. Write `.env` from GitHub Secrets (falls back to existing `.env` if none set)
-3. `docker compose up -d --build`
-4. Health check on `localhost:6001`
+Pushes to `main` trigger [`.github/workflows/pages.yml`](.github/workflows/pages.yml), which builds the site and
+publishes it to GitHub Pages. In the repository settings, Pages must use **GitHub Actions** as the source. No
+secrets or variables are needed.
